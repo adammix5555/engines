@@ -22,7 +22,7 @@ debug_txt = True
 rgb = False
 
 boids_num = 50
-detection_range = 15
+detection_range = 20
 
 mouse_attraction = 200
 
@@ -70,6 +70,8 @@ class Boids:
         space = 35
         close_other_rot = []
         close_other_speed = []
+        close_other_x = []
+        close_other_y = []
 
         for i in range(len(o_pos_x)):
 
@@ -96,6 +98,8 @@ class Boids:
             if dist < radius and dist > 0:
                 close_other_rot.append(other_rot)
                 close_other_speed.append(other_speed)
+                close_other_x.append(other_x)
+                close_other_y.append(other_y)
 
         if len(close_other_rot) > 0:
             sum_cos = 0
@@ -115,6 +119,19 @@ class Boids:
             self.velocity_y += (target_y - self.velocity_y) * 3 * dt
 
             self.speed = avg_speed
+
+        if len(close_other_x) > 0 and len(close_other_y) > 0:
+            avg_x = sum(close_other_x) / len(close_other_x)
+            avg_y = sum(close_other_y) / len(close_other_y)
+
+            rotation = math.atan2(avg_y - self.pos_y, avg_x - self.pos_x)
+
+            target_x2 = math.cos(rotation) * self.speed
+            target_y2 = math.sin(rotation) * self.speed
+
+            self.velocity_x += (target_x2 - self.velocity_x) * 3 * dt
+            self.velocity_y += (target_y2 - self.velocity_y) * 3 * dt
+
 
     def fuck_walls(self, dt):
         force = 600
